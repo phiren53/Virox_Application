@@ -1,0 +1,53 @@
+﻿.container {
+            width: 90% !important;
+        }
+        label {
+    margin-bottom: 0px;
+}
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 2px;
+            font-size: 12px;
+            white-space:nowrap;
+            background-color: #fff;
+        }
+
+        .headerCheckbox input {
+            margin: 0px 5px 0 0;
+        }
+
+        .btn-default, .btn-default.focus {
+            border-radius: 0px;
+            outline: none;
+        }
+
+            .btn-default.active, .btn-default.active.focus {
+                color: #fff;
+                background-color: #5bc0de;
+                border-color: #46b8da;
+                border-radius: 0px;
+                outline: none;
+            }
+
+        .tab-content {
+            padding: 20px;
+        }
+        .table-content{
+            overflow-y: scroll;
+            height: 80%;
+            position: fixed;
+            width: 90%;
+        }
+        .modal-dialog{
+            width: 90%;
+        }
+        #tablecontent{
+            height: 200px;
+            overflow-y: scroll;
+        }
+        .headerCheckbox{
+            float:left;
+        }
+        a.headerlink:hover{
+            text-decoration: none;
+        }

@@ -187,6 +187,66 @@ Public Class ExcelExport
         'WHERE OrderID = '1'
         'ORDER BY COLUMN_NAME"
 
+        ds = FetchMappingData()
+        lstQuery.DataValueField = "PrefixCOLUMN_NAME"
+        lstQuery.DataTextField = "DisplayName"
+        lstQuery.DataSource = ds
+        lstQuery.DataBind()
+
+        Session("Columns") = ds.Tables(0)
+
+        If LoadOptions.Rows.Count > 0 Then
+            Dim Data As String = LoadOptions.Rows(0)(1).ToString
+            hdnSelectQuery.Value = Data.Split("|")(1).ToString()
+
+            Dim Cols = hdnSelectQuery.Value.Split(",")
+            For Each obj As String In Cols
+                If obj IsNot Nothing Then
+                    For Each li As ListItem In lstQuery.Items
+                        If li.Value = obj Then
+                            li.Selected = True
+                        End If
+                    Next
+                End If
+            Next
+
+            Dim selecteddepartment As String = Data.Split("|")(0).ToString()
+            Dim Departments = selecteddepartment.Split(",")
+            For Each obj1 As String In Departments
+                If obj1 IsNot Nothing Then
+                    For Each li1 As ListItem In lstDepartment.Items
+                        If li1.Value = obj1.Replace("'", "") Then
+                            li1.Selected = True
+                        End If
+                    Next
+                End If
+            Next
+
+            BindGrid()
+        Else
+            For Each li As ListItem In lstQuery.Items
+                If li.Value = "ER_Employee_DB.Employee_ID" Or li.Value = "ER_Employee_DB.Employee_Name" Or li.Value = "ER_Employee_DB.Department" Then
+                    li.Selected = True
+                End If
+            Next
+            hdnSelectQuery.Value = ",ER_Employee_DB.Employee_Name,ER_Employee_DB.Employee_ID,ER_Employee_DB.Department"
+        End If
+
+        con.Close()
+
+    End Sub
+
+    Private Function FetchMappingData() As DataSet
+
+        Dim strConnString As String = ConfigurationManager.ConnectionStrings("ConString").ConnectionString
+        Dim con As New SqlConnection(strConnString)
+        Dim str As String
+        Dim com As SqlCommand
+        Dim sqlda As SqlDataAdapter
+        Dim ds As DataSet
+
+        con.Open()
+
         str = "SELECT COLUMN_NAME, PrefixCOLUMN_NAME, DisplayName,ColumnSequence FROM(
                 SELECT DISTINCT COLUMN_NAME, CONCAT(TABLE_NAME,'.', COLUMN_NAME) PrefixCOLUMN_NAME, DisplayName,ColumnSequence, ROW_NUMBER() OVER(PARTITION BY COLUMN_NAME ORDER BY COLUMN_NAME DESC) OrderID FROM INFORMATION_SCHEMA.COLUMNS 
                 LEFT JOIN ColumnMapping CM ON COLUMN_NAME = CM.TableColumnName
@@ -295,22 +355,22 @@ Public Class ExcelExport
                 AND COLUMN_NAME != 'Sec_Half_Sal'
                 AND COLUMN_NAME != 'first_half'
                 AND COLUMN_NAME != 'first_half_Sal'
-AND COLUMN_NAME != 'IG'
-AND COLUMN_NAME != 'PREFIX'
-AND COLUMN_NAME != 'Total_for_Children'
-AND COLUMN_NAME != 'Mode'
-AND COLUMN_NAME != 'WIFE_WORKING'
-AND COLUMN_NAME != 'TRANSPORT'
-AND COLUMN_NAME != 'SPIKPA'
-AND COLUMN_NAME != 'SPPA'
-AND COLUMN_NAME != 'Agent'
-AND COLUMN_NAME != 'EMPLOYEE_L_TYPE'
-AND COLUMN_NAME != 'Employee_Type_Finance'
-AND COLUMN_NAME != 'Bonus_Amount'
-AND COLUMN_NAME != 'Token'
-AND COLUMN_NAME != 'Insurance_Agent'
-AND COLUMN_NAME != 'Overtime_Rate'
-AND COLUMN_NAME != 'RETIRE_AGE'
+                AND COLUMN_NAME != 'IG'
+                AND COLUMN_NAME != 'PREFIX'
+                AND COLUMN_NAME != 'Total_for_Children'
+                AND COLUMN_NAME != 'Mode'
+                AND COLUMN_NAME != 'WIFE_WORKING'
+                AND COLUMN_NAME != 'TRANSPORT'
+                AND COLUMN_NAME != 'SPIKPA'
+                AND COLUMN_NAME != 'SPPA'
+                AND COLUMN_NAME != 'Agent'
+                AND COLUMN_NAME != 'EMPLOYEE_L_TYPE'
+                AND COLUMN_NAME != 'Employee_Type_Finance'
+                AND COLUMN_NAME != 'Bonus_Amount'
+                AND COLUMN_NAME != 'Token'
+                AND COLUMN_NAME != 'Insurance_Agent'
+                AND COLUMN_NAME != 'Overtime_Rate'
+                AND COLUMN_NAME != 'RETIRE_AGE'
 
                 ) ColumnList
                 WHERE OrderID = '1' ORDER BY COLUMN_NAME"
@@ -319,53 +379,9 @@ AND COLUMN_NAME != 'RETIRE_AGE'
         sqlda = New SqlDataAdapter(com)
         ds = New DataSet
         sqlda.Fill(ds, "COLUMN_NAME")
-        lstQuery.DataValueField = "PrefixCOLUMN_NAME"
-        lstQuery.DataTextField = "DisplayName"
-        lstQuery.DataSource = ds
-        lstQuery.DataBind()
+        Return ds
+    End Function
 
-        Session("Columns") = ds.Tables(0)
-
-        If LoadOptions.Rows.Count > 0 Then
-            Dim Data As String = LoadOptions.Rows(0)(1).ToString
-            hdnSelectQuery.Value = Data.Split("|")(1).ToString()
-
-            Dim Cols = hdnSelectQuery.Value.Split(",")
-            For Each obj As String In Cols
-                If obj IsNot Nothing Then
-                    For Each li As ListItem In lstQuery.Items
-                        If li.Value = obj Then
-                            li.Selected = True
-                        End If
-                    Next
-                End If
-            Next
-
-            Dim selecteddepartment As String = Data.Split("|")(0).ToString()
-            Dim Departments = selecteddepartment.Split(",")
-            For Each obj1 As String In Departments
-                If obj1 IsNot Nothing Then
-                    For Each li1 As ListItem In lstDepartment.Items
-                        If li1.Value = obj1.Replace("'", "") Then
-                            li1.Selected = True
-                        End If
-                    Next
-                End If
-            Next
-
-            BindGrid()
-        Else
-            For Each li As ListItem In lstQuery.Items
-                If li.Value = "ER_Employee_DB.Employee_ID" Or li.Value = "ER_Employee_DB.Employee_Name" Or li.Value = "ER_Employee_DB.Department" Then
-                    li.Selected = True
-                End If
-            Next
-            hdnSelectQuery.Value = ",ER_Employee_DB.Employee_Name,ER_Employee_DB.Employee_ID,ER_Employee_DB.Department"
-        End If
-
-        con.Close()
-
-    End Sub
     Private Function LoadOptions() As DataTable
         Dim strConnString As String = ConfigurationManager.ConnectionStrings("ConString").ConnectionString
         Dim con As New SqlConnection(strConnString)
@@ -407,6 +423,8 @@ AND COLUMN_NAME != 'RETIRE_AGE'
     Private Function SetColumnNameAndOrder(dataTable As DataTable, changeName As Boolean) As DataTable
         Try
 #Region "To Set column name As per mapping table."
+            Dim ds As DataSet = FetchMappingData()
+            Session("Columns") = ds.Tables(0)
             Dim ColumnTable As DataTable = CType(Session("Columns"), DataTable)
 
 

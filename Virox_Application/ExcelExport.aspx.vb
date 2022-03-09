@@ -1057,6 +1057,7 @@ Public Class ExcelExport
                         Dim row As DataRow = ColumnTable.Select("COLUMN_NAME = '" + lnk.Text + "'").FirstOrDefault()
                         If Not row Is Nothing AndAlso row.Item("DisplayName").ToString() IsNot "" Then
                             lnk.Text = row.Item("DisplayName").ToString()
+                            lnk.Attributes("searchcolumnname") = lnk.Text.ToString()
                         End If
 
                     End If
